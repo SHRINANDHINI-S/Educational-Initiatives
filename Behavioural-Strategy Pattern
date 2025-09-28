@@ -22,7 +22,7 @@ class TravelContext:
     def go(self):
         self.strategy.travel()
 
-# Client Code
+
 context = TravelContext(TrainStrategy())
 context.go()
 
