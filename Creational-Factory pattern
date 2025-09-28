@@ -1,0 +1,24 @@
+class Notification:
+    def send(self, msg): pass
+
+class SMS(Notification):
+    def send(self, msg):
+        print("Sending SMS:", msg)
+
+class Email(Notification):
+    def send(self, msg):
+        print("Sending Email:", msg)
+
+class Push(Notification):
+    def send(self, msg):
+        print("Sending Push Notification:", msg)
+
+class NotificationFactory:
+    @staticmethod
+    def create(channel):
+        if channel == "sms": return SMS()
+        if channel == "email": return Email()
+        if channel == "push": return Push()
+
+notifier = NotificationFactory.create("email")
+notifier.send("Hello World!")
