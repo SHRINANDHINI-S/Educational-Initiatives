@@ -1,30 +1,29 @@
-#Weather Station & Display Units
-class WeatherStation:
-    def __init__(self):
-        self.temperature = None
-        self.observers = []
+#YouTube Channel Subscribers
+class Channel:
+    def __init__(self, name):
+        self.name = name
+        self.subscribers = []
 
-    def add_observer(self, observer):
-        self.observers.append(observer)
+    def subscribe(self, user):
+        self.subscribers.append(user)
 
-    def set_temperature(self, temp):
-        self.temperature = temp
-        self.notify()
+    def upload_video(self, title):
+        print(f"\n{self.name} uploaded: {title}")
+        for sub in self.subscribers:
+            sub.notify(title)
 
-    def notify(self):
-        for obs in self.observers:
-            obs.update(self.temperature)
-
-class Display:
+class Subscriber:
     def __init__(self, name):
         self.name = name
 
-    def update(self, temp):
-        print(f"{self.name} display shows: {temp}°C")
+    def notify(self, title):
+        print(f"{self.name} got notification: New video - {title}")
 
-station = WeatherStation()
-station.add_observer(Display("Mobile App"))
-station.add_observer(Display("LED Screen"))
+# Client Code
+channel = Channel("TechWorld")
+s1, s2 = Subscriber("Alice"), Subscriber("Bob")
 
-station.set_temperature(30)
-station.set_temperature(25)
+channel.subscribe(s1)
+channel.subscribe(s2)
+
+channel.upload_video("Python Tutorial")
