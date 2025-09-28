@@ -1,0 +1,172 @@
+import logging
+from collections import defaultdict
+
+# ---------------- LOGGING SETUP ---------------- #
+logging.basicConfig(
+    filename="virtual_classroom.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# ---------------- CUSTOM ERRORS ---------------- #
+class ClassroomError(Exception):
+    pass
+
+class StudentError(Exception):
+    pass
+
+class AssignmentError(Exception):
+    pass
+
+
+# ---------------- ENTITY CLASSES ---------------- #
+class Classroom:
+    """Represents a Virtual Classroom."""
+    def __init__(self, name: str):
+        self.name = name
+        self.students = {}
+        self.assignments = []
+
+    def __str__(self):
+        return f"Classroom({self.name})"
+
+
+class Student:
+    """Represents a Student."""
+    def __init__(self, student_id: str):
+        self.student_id = student_id
+        self.submissions = {}
+
+    def __str__(self):
+        return f"Student({self.student_id})"
+
+
+# ---------------- MANAGER (Facade) ---------------- #
+class VirtualClassroomManager:
+    """Manages Classrooms, Students, and Assignments."""
+    def __init__(self):
+        self.classrooms = {}
+
+    # ---------- Classroom Management ---------- #
+    def add_classroom(self, class_name: str):
+        if class_name in self.classrooms:
+            raise ClassroomError(f"Classroom {class_name} already exists.")
+        self.classrooms[class_name] = Classroom(class_name)
+        print(f"Classroom {class_name} has been created.")
+        logging.info(f"Created classroom {class_name}")
+
+    def list_classrooms(self):
+        if not self.classrooms:
+            print("No classrooms available.")
+        else:
+            print("Classrooms:")
+            for name in self.classrooms:
+                print(f" - {name}")
+
+    def remove_classroom(self, class_name: str):
+        if class_name not in self.classrooms:
+            raise ClassroomError(f"Classroom {class_name} does not exist.")
+        del self.classrooms[class_name]
+        print(f"Classroom {class_name} has been removed.")
+        logging.info(f"Removed classroom {class_name}")
+
+    # ---------- Student Management ---------- #
+    def add_student(self, student_id: str, class_name: str):
+        if class_name not in self.classrooms:
+            raise ClassroomError(f"Classroom {class_name} does not exist.")
+        classroom = self.classrooms[class_name]
+        if student_id in classroom.students:
+            raise StudentError(f"Student {student_id} already enrolled in {class_name}.")
+        classroom.students[student_id] = Student(student_id)
+        print(f"Student {student_id} has been enrolled in {class_name}.")
+        logging.info(f"Enrolled student {student_id} in {class_name}")
+
+    def list_students(self, class_name: str):
+        if class_name not in self.classrooms:
+            raise ClassroomError(f"Classroom {class_name} does not exist.")
+        students = self.classrooms[class_name].students
+        if not students:
+            print(f"No students enrolled in {class_name}.")
+        else:
+            print(f"Students in {class_name}:")
+            for s in students:
+                print(f" - {s}")
+
+    # ---------- Assignment Management ---------- #
+    def schedule_assignment(self, class_name: str, details: str):
+        if class_name not in self.classrooms:
+            raise ClassroomError(f"Classroom {class_name} does not exist.")
+        classroom = self.classrooms[class_name]
+        classroom.assignments.append(details)
+        print(f"Assignment for {class_name} has been scheduled.")
+        logging.info(f"Scheduled assignment '{details}' in {class_name}")
+
+    def submit_assignment(self, student_id: str, class_name: str, details: str):
+        if class_name not in self.classrooms:
+            raise ClassroomError(f"Classroom {class_name} does not exist.")
+        classroom = self.classrooms[class_name]
+        if student_id not in classroom.students:
+            raise StudentError(f"Student {student_id} is not enrolled in {class_name}.")
+        student = classroom.students[student_id]
+        if details not in classroom.assignments:
+            raise AssignmentError(f"Assignment '{details}' is not scheduled for {class_name}.")
+        student.submissions[details] = "Submitted"
+        print(f"Assignment submitted by Student {student_id} in {class_name}.")
+        logging.info(f"Student {student_id} submitted assignment '{details}' in {class_name}")
+
+
+# ---------------- MAIN CLI LOOP ---------------- #
+def main():
+    manager = VirtualClassroomManager()
+    print("=== Virtual Classroom Manager ===")
+    print("Commands: add_classroom, remove_classroom, list_classrooms, "
+          "add_student, list_students, schedule_assignment, submit_assignment, exit")
+
+    while True:
+        try:
+            command = input("\n> ").strip().split()
+            if not command:
+                continue
+
+            action = command[0]
+
+            if action == "add_classroom":
+                manager.add_classroom(command[1])
+
+            elif action == "remove_classroom":
+                manager.remove_classroom(command[1])
+
+            elif action == "list_classrooms":
+                manager.list_classrooms()
+
+            elif action == "add_student":
+                manager.add_student(command[1], command[2])
+
+            elif action == "list_students":
+                manager.list_students(command[1])
+
+            elif action == "schedule_assignment":
+                class_name = command[1]
+                details = " ".join(command[2:])
+                manager.schedule_assignment(class_name, details)
+
+            elif action == "submit_assignment":
+                student_id = command[1]
+                class_name = command[2]
+                details = " ".join(command[3:])
+                manager.submit_assignment(student_id, class_name, details)
+
+            elif action == "exit":
+                print("Exiting Virtual Classroom Manager...")
+                break
+
+            else:
+                print("Unknown command. Please try again.")
+
+        except Exception as e:
+            logging.error(str(e))
+            print("Error:", str(e))
+
+
+if __name__ == "__main__":
+    main()
