@@ -1,0 +1,21 @@
+#Printer Spooler
+class PrinterSpooler:
+    __instance = None
+
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__instance.jobs = []
+        return cls.__instance
+
+    def add_job(self, job):
+        self.jobs.append(job)
+        print(f"Added print job: {job}")
+
+p1 = PrinterSpooler()
+p2 = PrinterSpooler()
+
+p1.add_job("Document1")
+p2.add_job("Document2")
+
+print(p1.jobs)  
