@@ -1,0 +1,19 @@
+#Payment Gateway
+class OldGateway:
+    def make_payment(self, amount):
+        print(f"Paid {amount} via Old Gateway")
+
+class NewGateway:
+    def process(self, amount):
+        print(f"Paid {amount} via New Gateway")
+
+class PaymentAdapter(OldGateway):
+    def __init__(self, new_gateway):
+        self.new_gateway = new_gateway
+
+    def make_payment(self, amount):
+        self.new_gateway.process(amount)
+
+
+adapter = PaymentAdapter(NewGateway())
+adapter.make_payment(500)
