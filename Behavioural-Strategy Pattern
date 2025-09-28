@@ -1,0 +1,30 @@
+#Travel Routes
+class TravelStrategy:
+    def travel(self):
+        pass
+
+class CarStrategy(TravelStrategy):
+    def travel(self):
+        print("Traveling by Car")
+
+class TrainStrategy(TravelStrategy):
+    def travel(self):
+        print("Traveling by Train")
+
+class FlightStrategy(TravelStrategy):
+    def travel(self):
+        print("Traveling by Flight")
+
+class TravelContext:
+    def __init__(self, strategy):
+        self.strategy = strategy
+
+    def go(self):
+        self.strategy.travel()
+
+# Client Code
+context = TravelContext(TrainStrategy())
+context.go()
+
+context = TravelContext(FlightStrategy())
+context.go()
